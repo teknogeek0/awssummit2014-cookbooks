@@ -1,5 +1,5 @@
-reinvent2013-cookbooks
+awssummit2014-cookbooks
 ======================
 
-Cookbooks used during re:Invent 2013
+Cookbooks used during the AWS Summit 2014 Bootcamp "Taking AWS Operations to the Next Level"
 
