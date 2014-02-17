@@ -25,7 +25,6 @@
   $workflow_domain = $IHSWFDomain;
   $workflow_type_name = "IHWorkFlowMain";
 
-
   $ACTIVITY_NAME = "EIPMapper";
   $ACTIVITY_VERSION = $IHACTIVITY_VERSION;
   $DEBUG = false;
@@ -96,23 +95,45 @@
 
       $ec2 = new AmazonEC2(array('default_cache_config' => '/tmp/secure-dir'));
       $ec2->set_region($GLOBALS["EC2_Region"]);
-      $eip_opt = array(
-      'Domain'=> "vpc"
-      );
       
       ### do look up for existing EIP
+      $response = $ec2->describe_addresses(array('Filter' => array(array("Name"=>"domain", "Value"=> "vpc"))));
+      $MyIpAddr;
+      $MyAllocId;
 
-      ##test response
-      if()
+      ##check for existing EIPs
+      if($response->isOK())
       {
+        $items = $response->body->addressesSet->item; 
+        foreach ($items as $respObj)
+        {
+          if(!isset($respObj->instanceId))
+          {
+  
+            $MyIpAddr = $respObj->publicIp;
+            $MyAllocId = $respObj->allocationId;
+          }
+        }
+      }
 
+      if(isset($MyAllocId) && isset($MyIpAddr))
+      {
+        ##looks like we have an EIP that is free
+        ##map EIP to instance
+        $attachRep = attach_EIP($MyInstance, $MyIpAddr, $MyAllocId);
+        return $attachRep;
       }
       else
       {
         #looks like we don't yet have an EIP available, so get one now.
         #get an EIP, this can fail if you are near your quota for EIPs
+        $eip_opt = array(
+        'Domain'=> "vpc"
+        );
+
         $response = $ec2->allocate_address($eip_opt);
 
+        ##if we were able to create an EIP, then find its allocationId and publicIP and map it.
         if($response->isOK())
         {
           $bodyarray=$response->body->to_array();
@@ -124,30 +145,8 @@
           );
 
           #we have an EIP, and an Allocation ID, so map this to our instance
-          $response2 = $ec2->associate_address($MyInstance,"",$assocAddr_opt);
-          if($response2->isOK())
-          {
-            $successMsg="SUCCESS: EIPMapper: Successfully created EIP with IP: ".$MyIpAddr.", and attached it to instance: ".$MyInstance.PHP_EOL;
-            cheap_logger($GLOBALS["ACTIVITY_NAME"], $successMsg);
-            return $successMsg;
-          }
-          else
-          {
-            $failMsg="FAIL: EIPMapper: There was a problem attaching the EIP to the instance." .PHP_EOL;
-            cheap_logger($GLOBALS["ACTIVITY_NAME"], $failMsg);
-            var_dump($response2->body);
-            $response3 = $ec2->release_address(array('AllocationId'=>"$MyAllocId"));
-            if($response3->isOK())
-            {
-              $failMsg.="I was able to release the IPaddress.".PHP_EOL;
-            }
-            else
-            {
-              $failMsg.="I was unable to release the IPaddress.".PHP_EOL;
-              var_dump($response3->body);
-            }
-            return $failMsg;
-          }
+          $attachRep = attach_EIP($MyInstance, $MyIpAddr, $MyAllocId);
+          return $attachRep;
         }
         else
         {
@@ -162,6 +161,33 @@
     {
       $failMsg="FAIL: EIPMapper: We got input that we don't understand: ".$input. PHP_EOL;
       cheap_logger($GLOBALS["ACTIVITY_NAME"], $failMsg);
+      return $failMsg;
+    }
+  }
+
+  function attach_EIP($MyInstance, $MyIpAddr, $MyAllocId)
+  {
+    ##if in here we found a free EIP, so lets attach it
+    $assocAddr_opt = array(
+      'AllocationId'=> "$MyAllocId"
+    );
+
+    $ec2 = new AmazonEC2(array('default_cache_config' => '/tmp/secure-dir'));
+    $ec2->set_region($GLOBALS["EC2_Region"]);
+
+    #we have an EIP, and an Allocation ID, so map this to our instance
+    $response = $ec2->associate_address($MyInstance,"",$assocAddr_opt);
+    if($response->isOK())
+    {
+      $successMsg="SUCCESS: EIPMapper: Successfully mapped the EIP with IP: ".$MyIpAddr." to instance: ".$MyInstance.PHP_EOL;
+      cheap_logger($GLOBALS["ACTIVITY_NAME"], $successMsg);
+      return $successMsg;
+    }
+    else
+    {
+      $failMsg="FAIL: EIPMapper: There was a problem attaching the EIP with IP: ".$MyIpAddr." to instance: ".$MyInstance.PHP_EOL;
+      cheap_logger($GLOBALS["ACTIVITY_NAME"], $failMsg);
+      var_dump($response2->body);
       return $failMsg;
     }
   }
