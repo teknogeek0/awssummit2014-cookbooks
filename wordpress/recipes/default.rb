@@ -25,10 +25,10 @@ node[:deploy].each do |application, deploy|
     group "root"
     mode "0644"
     variables(
-      :database        => node[:opsworks][:stack][:rds_instances][0][:db_name],
-      :user            => node[:opsworks][:deploy][:database][:username],
-      :password        => node[:opsworks][:deploy][:database][:password],
-      :dbhost          => node[:opsworks][:stack][:rds_instances][0][:address],
+      :database        => (deploy[:database][:database] rescue nil),
+      :user            => (deploy[:database][:username] rescue nil),
+      :password        => (deploy[:database][:password] rescue nil),
+      :dbhost          => (deploy[:database][:host] rescue nil),
       :lang            => node['wordpress']['languages']['lang'],
       :cachenode       => node['wordpress']['cachenode']
     )
