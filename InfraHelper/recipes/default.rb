@@ -94,42 +94,42 @@ cron "IHQeueWatcher-30" do
 end
 
 cron "IHDeciderStart" do
-  command "/usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 5; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php") end
 end
 
 cron "IHDeciderStarti-30" do
-  command "sleep 30; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 35; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHDeciderStart.php") end
 end
 
 cron "IHActWorker_EIP" do
-  command "/usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 10; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php") end
 end
 
 cron "IHActWorker_EIP-30" do
-  command "sleep 30; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 40; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_EIP.php") end
 end
 
 cron "IHActWorker_SrcDestCheck" do
-  command "/usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 15; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php") end
 end
 
 cron "IHActWorker_SrcDestCheck-30" do
-  command "sleep 30; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 45; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_SrcDestCheck.php") end
 end
 
 cron "IHActWorker_VPCRouteMapper" do
-  command "/usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 20; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php") end
 end
 
 cron "IHActWorker_VPCRouteMapper-30" do
-  command "sleep 30; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php >>/tmp/IHstuff.log 2>&1"
+  command "sleep 50; /usr/bin/php #{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php >>/tmp/IHstuff.log 2>&1"
   only_if do File.exist?("#{node['InfraHelper']['base_dir']}/bin/IHActWorker_VPCRouteMapper.php") end
 end
 
